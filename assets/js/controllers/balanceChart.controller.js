@@ -3,26 +3,31 @@ angular
   .controller('BalanceChartController', BalanceChartController);
 
 function BalanceChartController ($scope, $state, Wallet, currency) {
-  let routes = { 'Bitcoin': 'btc', 'Ether': 'eth', 'Bitcoin Cash': 'bch' };
-
-  $scope.chart = null;
-  $scope.state = { ethBalance: 500, btcBalance: 100, bchBalance: 100 };
+  let fiat = Wallet.settings.currency;
+  let cryptoMap = currency.cryptoCurrencyMap;
+  let fiatOf = (currency) => cryptoMap[currency].from($scope[currency].total(), fiat);
+  let total = fiatOf('btc') + fiatOf('eth') + fiatOf('bch');
 
   $scope.options = {
     chart: {
       height: 230
     },
     title: {
-      text: '$1000.00',
+      text: total,
       align: 'center',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
+      style: {
+        fontSize: '18px',
+        fontWeight: 'bold'
+      }
     },
     plotOptions: {
       pie: {
         allowPointSelect: true,
+        cursor: 'pointer',
         dataLabels: { enabled: false },
         events: {
-          click: (evt) => $state.go('wallet.common.' + routes[evt.point.name])
+          click: (evt) => $state.go('wallet.common.' + evt.point.id)
         }
       },
       line: {
@@ -40,19 +45,19 @@ function BalanceChartController ($scope, $state, Wallet, currency) {
         cursor: 'pointer',
         data: [
           {
-            y: 100,
+            y: fiatOf('eth'),
             id: 'eth',
             name: 'Ether',
             color: '#004a7c'
           },
           {
-            y: 200,
+            y: fiatOf('btc'),
             id: 'btc',
             name: 'Bitcoin',
             color: '#10ADE4'
           },
           {
-            y: 100,
+            y: fiatOf('bch'),
             id: 'bch',
             name: 'Bitcoin Cash',
             color: '#B2D5E5'

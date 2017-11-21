@@ -2,15 +2,17 @@ angular
   .module('walletApp')
   .controller('HomeCtrl', HomeCtrl);
 
-function HomeCtrl ($scope, Wallet, $uibModal, tradeStatus, localStorageService, Ethereum, currency) {
-  $scope.BTCCurrency = currency.bitCurrencies.filter(c => c.code === 'BTC')[0];
-  $scope.getLegacyTotal = () => Wallet.total('imported');
-  $scope.getTotal = () => Wallet.total('');
-  $scope.settings = Wallet.settings;
+function HomeCtrl ($scope, MyWallet, Wallet, Ethereum, tradeStatus, localStorageService, currency) {
+  $scope.btc = {
+    total: () => Wallet.total('') + Wallet.total('imported')
+  };
 
   $scope.eth = {
-    total: () => Ethereum.balance,
-    defaultAccount: Ethereum.defaultAccount
+    total: () => Ethereum.balance
+  };
+
+  $scope.bch = {
+    total: () => MyWallet.wallet.bch.balance || 0
   };
 
   $scope.isWalletInitialized = () => {
